@@ -33,6 +33,15 @@ module Communicator
     # on failure
     def receiver_for(source)
       return receivers[source] if receivers[source]
+      
+      # If not found in the first place, maybe the class just isn't loaded yet and
+      # thus hasn't registered - let's require all models and try again
+      if defined?(Rails)
+        Dir[File.join(Rails.root, 'app/models/**/*.rb')].each {|model| require model}
+        return receivers[source] if receivers[source]
+      end
+      
+      # When everything else fails, just throw an exception...
       raise Communicator::ReceiverUnknown.new("No receiver registered for '#{source}'")
     end
   end

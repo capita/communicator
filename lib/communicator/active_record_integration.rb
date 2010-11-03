@@ -40,7 +40,7 @@ module Communicator::ActiveRecordIntegration
       input = JSON.parse(input) if input.kind_of?(String)
       input.each do |attr_name, value|
         # Exclude skipped attributes
-        next if self.class.skipped_remote_attributes.include?(attr_name.to_sym)
+        next if self.class.skipped_remote_attributes.include?(attr_name.to_sym) or !attributes.has_key?(attr_name)
         self.send("#{attr_name}=", value)
       end
       self.updated_from_message = true

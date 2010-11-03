@@ -63,6 +63,8 @@ class receives updates from like this:
 If you want to skip some remote attributes and not let them progapate into local instances,
 use `receives_from :post, :except => [:user_id]`.
 
+Attributes that are not physically present in the local database will be skipped automatically.
+
 Use the automatically added `publish` instance method on your models to push changes
 to the other side. They will be enqueued in the local `outbound_messages` table and
 will arrive at the other side when a client pulls or pushes.
