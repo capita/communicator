@@ -16,12 +16,14 @@ require 'factories'
 # Connect to client test database
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "db/test_client.sqlite3")
 require 'lib/post'
+require 'lib/comment'
 
 # Connect to server database too so we can peek into what's happening over there
 class TestServerDatabase < ActiveRecord::Base
   establish_connection(:adapter => 'sqlite3', :database => "db/test_server.sqlite3")  
 end
 require 'lib/test_server_database/post'
+require 'lib/test_server_database/comment'
 require 'lib/test_server_database/inbound_message'
 require 'lib/test_server_database/outbound_message'
 
@@ -39,9 +41,11 @@ class Test::Unit::TestCase
     Communicator::InboundMessage.delete_all
     Communicator::OutboundMessage.delete_all
     Post.delete_all
+    Comment.delete_all
     
     TestServerDatabase::InboundMessage.delete_all
     TestServerDatabase::OutboundMessage.delete_all
     TestServerDatabase::Post.delete_all
+    TestServerDatabase::Comment.delete_all
   end
 end

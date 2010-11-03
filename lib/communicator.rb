@@ -20,9 +20,13 @@ module Communicator
     # Register a given class as a receiver from source (underscored name). Will then
     # mix in the instance methods from Communicator::ActiveRecord::InstanceMethods so
     # message processing and publishing functionality is included
-    def register_receiver(target, source)
+    def register_receiver(target, source, options={})
       receivers[source] = target
       target.send(:include, Communicator::ActiveRecordIntegration::InstanceMethods)
+      
+      target.skip_remote_attributes(*options[:except]) if options[:except]
+      
+      target
     end
     
     # Tries to find the receiver for given source, raising Communicator::ReceiverUnknown

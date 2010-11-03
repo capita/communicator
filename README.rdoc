@@ -59,6 +59,9 @@ class receives updates from like this:
   class Post < ActiveRecord::Base
     receives_from :post
   end
+  
+If you want to skip some remote attributes and not let them progapate into local instances,
+use `receives_from :post, :except => [:user_id]`.
 
 Use the automatically added `publish` instance method on your models to push changes
 to the other side. They will be enqueued in the local `outbound_messages` table and

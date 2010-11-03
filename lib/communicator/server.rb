@@ -16,12 +16,28 @@ class Communicator::Server < Sinatra::Base
     end
   end
   
-  use Rack::Auth::Basic do |username, password|
-    [username, password] == [Communicator::Server.username, Communicator::Server.password]
+  # use Rack::Auth::Basic do |username, password|
+  #   [username, password] == [Communicator::Server.username, Communicator::Server.password]
+  # end
+  
+  helpers do
+    def protected!
+      unless authorized?
+        response['WWW-Authenticate'] = %(Basic realm="Testing HTTP Auth")
+        throw(:halt, [401, "Not authorized\n"])
+      end
+    end
+
+    def authorized?
+      @auth ||=  Rack::Auth::Basic::Request.new(request.env)
+      @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == [Communicator::Server.username, Communicator::Server.password]
+    end
   end
+
   
   # PULL
   get '/messages.json' do
+    protected!
     # Require from_id attribute
     return [409, "Specify from_id!"] unless params[:from_id]
     
@@ -39,6 +55,8 @@ class Communicator::Server < Sinatra::Base
   
   # PUSH
   post '/messages.json' do
+    protected!
+    
     body = request.body.read.strip
     # Make sure a message body is given!
     return [409, "No data given"] if body.length < 2

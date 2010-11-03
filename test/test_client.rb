@@ -121,6 +121,22 @@ class TestClient < Test::Unit::TestCase
       end
     end
     
+    # Make sure attributes skipped with :except are not saved at remote
+    context "PUSHing a new comment" do
+      setup do
+        assert @comment = Comment.create(:title => 'my comment', :body => 'some comment')
+        Communicator::Client.push
+      end
+      
+      should "have created the comment at remote" do
+        assert_equal 'some comment', TestServerDatabase::Comment.first.body
+      end
+      
+      should "have skipped permissions attribute when processing at remote" do
+        assert_nil TestServerDatabase::Comment.first.title
+      end
+    end
+    
     context "when an update message is created at remote" do
       setup do
         @remote_msg = TestServerDatabase::OutboundMessage.create!(:body => {:post => {:id => 25, :title => 'new title', :body => 'remote body'}}.to_json)

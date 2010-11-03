@@ -8,8 +8,18 @@ module Communicator::ActiveRecordIntegration
     #    receives_from :post
     #  end
     #
-    def receives_from(source)
-      Communicator.register_receiver(self, source)
+    def receives_from(source, options={})
+      Communicator.register_receiver(self, source, options)
+    end
+    
+    def skipped_remote_attributes
+      @skipped_remote_attributes ||= []
+    end
+    
+    def skip_remote_attributes(*attr_names)
+      attr_names.each do |attr_name|
+        skipped_remote_attributes << attr_name.to_sym
+      end
     end
   end
   
@@ -24,11 +34,13 @@ module Communicator::ActiveRecordIntegration
     end
     
     # Processes the given message body by applying all contained attributes and their values
-    # and saving
+    # and saving. When the setter instance method is missing on the local record, skip that attribute.
     def process_message(input)
       # When the input is still json, parse it. Otherwise we're assuming it's already a demarshalled hash
       input = JSON.parse(input) if input.kind_of?(String)
       input.each do |attr_name, value|
+        # Exclude skipped attributes
+        next if self.class.skipped_remote_attributes.include?(attr_name.to_sym)
         self.send("#{attr_name}=", value)
       end
       self.updated_from_message = true
