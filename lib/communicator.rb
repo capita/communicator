@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bundler'
 Bundler.setup(:default)
 require 'json'
+require 'active_record'
 
 module Communicator
   # Error to be raised when no receiver can be found for a message that is to be processed

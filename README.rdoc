@@ -1,6 +1,72 @@
 = communicator
 
-TODO!!
+A simple communication layer to keep database records in sync between two
+Rails apps.
+
+== Setup
+
+Install in Rails apps with:
+
+  gem 'communicator'
+  $ bundle install
+  
+Import rake tasks in your Rails.root/Rakefile:
+
+  require 'communicator/tasks'
+  
+Set up the database tables for the messages by importing the corresponding
+migrations from the gem:
+
+  $ rake communicator:update_migrations
+  $ rake db:migrate
+  
+After doing these steps, you can proceed to configure either the server or client
+side as specified in the following subsections.
+  
+== Server side
+  
+On the server side, you can mount the server component in a Rails 2.3 app
+as a rack middleware inside environment.rb:
+
+  require 'communicator'
+  Communicator::Server.username = 'foo'
+  Communicator::Server.password = 'bar'
+  config.middleware.use 'Communicator::Server'
+
+It will then be mounted at /messages.json for GET and POST requests, requesting
+HTTP Basic Auth with the configured credentials.
+
+== Client side
+
+Tell the client the server url and port as well as the auth credentials inside
+your environment.rb:
+
+  require 'communicator'
+  Communicator::Client.username = 'test'
+  Communicator::Client.password = 'test'
+  Communicator::Client.base_uri 'localhost:3001'
+    
+When everything's fine, you should be able to push and pull using the client:
+
+  Communicator::Client.push
+  Communicator::Client.pull
+  
+== Active Record integration
+
+To keep models in sync, specify the model class (in underscored type) the local
+class receives updates from like this:
+
+  class Post < ActiveRecord::Base
+    receives_from :post
+  end
+
+Use the automatically added `publish` instance method on your models to push changes
+to the other side. They will be enqueued in the local `outbound_messages` table and
+will arrive at the other side when a client pulls or pushes.
+
+When an update is received from a remote side, the message will be stored in
+`inbound_messages` and the received changes will be applied to the local record,
+either updating existing or creating new records.
 
 == Note on Patches/Pull Requests
  
@@ -14,4 +80,4 @@ TODO!!
 
 == Copyright
 
-Copyright (c) 2010 "Christoph. See LICENSE for details.
+Copyright (c) 2010 Capita Unternehmensberatung GmbH. See LICENSE for details.

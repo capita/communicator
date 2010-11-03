@@ -1,4 +1,6 @@
 class Communicator::InboundMessage < ActiveRecord::Base
+  set_table_name 'inbound_messages'
+  
   validates_presence_of :body
   
   named_scope :unpublished, :conditions => {:processed_at => nil}

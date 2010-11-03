@@ -54,7 +54,7 @@ namespace :test_server do
     Thread.new do
       # Capture sinatra output (to hide it away...)
       require "open3"
-      Open3.popen3("rackup test/config.ru -p 20359 --pid=#{File.join(File.dirname(__FILE__), 'test', 'rack.pid')}")
+      Open3.popen3("bundle exec rackup test/config.ru -p 20359 --pid=#{File.join(File.dirname(__FILE__), 'test', 'rack.pid')}")
     end
     sleep 2.0
   

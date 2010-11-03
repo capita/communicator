@@ -1,4 +1,5 @@
 class Communicator::OutboundMessage < ActiveRecord::Base
+  set_table_name "outbound_messages"
   validates_presence_of :body
   
   named_scope :undelivered, :conditions => {:delivered_at => nil}
