@@ -1,12 +1,11 @@
 PATH
   remote: .
   specs:
-    communicator (0.1.0)
+    communicator (0.1.1)
       activerecord (< 3.0.0)
       httparty (>= 0.6.1)
       json (>= 1.4.0)
       sinatra (~> 1.1.0)
-      sinatra-basic-auth
 
 GEM
   remote: http://rubygems.org/
@@ -26,8 +25,6 @@ GEM
     sinatra (1.1.0)
       rack (~> 1.1)
       tilt (~> 1.1)
-    sinatra-basic-auth (0.1.0)
-      sinatra
     sqlite3-ruby (1.3.2)
     tilt (1.1)
 
@@ -44,5 +41,4 @@ DEPENDENCIES
   rack-test (>= 0.5.6)
   shoulda (= 2.10.3)
   sinatra (~> 1.1.0)
-  sinatra-basic-auth
   sqlite3-ruby (>= 1.3.0)

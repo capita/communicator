@@ -52,3 +52,15 @@ require 'communicator/client'
 require 'communicator/active_record_integration'
 require 'communicator/outbound_message'
 require 'communicator/inbound_message'
+
+# Autoload config when present for rails
+if defined?(Rails)
+  config_path = File.join(Rails.root, 'config', 'communicator.yml')
+  if File.exist?(config_path)
+    config = YAML.load_file(config_path).with_indifferent_access[Rails.env]
+    puts "Config file for communicator found, but does not have configuration for env #{Rails.env}" unless config.kind_of?(Hash)
+    Communicator::Server.username = Communicator::Client.username = config[:username]
+    Communicator::Server.password = Communicator::Client.password = config[:password]
+    Communicator::Client.base_uri config[:base_uri]
+  end
+end

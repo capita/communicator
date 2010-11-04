@@ -16,10 +16,6 @@ class Communicator::Server < Sinatra::Base
     end
   end
   
-  # use Rack::Auth::Basic do |username, password|
-  #   [username, password] == [Communicator::Server.username, Communicator::Server.password]
-  # end
-  
   helpers do
     def protected!
       unless authorized?
@@ -27,7 +23,7 @@ class Communicator::Server < Sinatra::Base
         throw(:halt, [401, "Not authorized\n"])
       end
     end
-
+  
     def authorized?
       @auth ||=  Rack::Auth::Basic::Request.new(request.env)
       @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == [Communicator::Server.username, Communicator::Server.password]

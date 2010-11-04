@@ -20,8 +20,38 @@ migrations from the gem:
   $ rake communicator:update_migrations
   $ rake db:migrate
   
-After doing these steps, you can proceed to configure either the server or client
-side as specified in the following subsections.
+After doing these steps, you can proceed to configure either the server or client.
+On both sides, you'll have to configure the client and server. You can do so
+by placing a configuration file in Rails.root/config/communicator.yml that looks
+somewhat like this:
+
+  defaults: &defaults
+    username: communicator
+    password: verysecret
+    base_uri: localhost:3001 # Can be ommitted for server config
+
+  test:
+    <<: *defaults
+  
+  development:
+    <<: *defaults
+  
+  production:
+    <<: *defaults
+    password: Uber!Secret
+    base_uri: 192.168.0.104:4000 # Can be ommitted for server config
+    
+The configuration for the current `Rails.env` will then be automatically loaded 
+when you `require 'communicator'`.
+
+You can also skip the YAML configuration and set up the credentials programmatically:
+
+  Communicator::Server.username = 'foo'
+  Communicator::Server.password = 'bar'
+  
+  Communicator::Client.username = 'foo'
+  Communicator::Client.password = 'bar'
+  Communicator::Client.base_uri 'localhost:1234'
   
 == Server side
   
@@ -29,8 +59,6 @@ On the server side, you can mount the server component in a Rails 2.3 app
 as a rack middleware inside environment.rb:
 
   require 'communicator'
-  Communicator::Server.username = 'foo'
-  Communicator::Server.password = 'bar'
   config.middleware.use 'Communicator::Server'
 
 It will then be mounted at /messages.json for GET and POST requests, requesting
@@ -42,9 +70,6 @@ Tell the client the server url and port as well as the auth credentials inside
 your environment.rb:
 
   require 'communicator'
-  Communicator::Client.username = 'test'
-  Communicator::Client.password = 'test'
-  Communicator::Client.base_uri 'localhost:3001'
     
 When everything's fine, you should be able to push and pull using the client:
 
