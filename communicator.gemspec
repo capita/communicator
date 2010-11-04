@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{communicator}
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Christoph Olszowka"]
-  s.date = %q{2010-11-03}
+  s.date = %q{2010-11-04}
   s.description = %q{Data push/pull between apps with local inbound/outbound queue and easy publish/process interface}
   s.email = %q{christoph at olszowka de}
   s.extra_rdoc_files = [
