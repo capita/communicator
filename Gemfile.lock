@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    communicator (0.1.1)
+    communicator (0.1.2)
       activerecord (< 3.0.0)
       httparty (>= 0.6.1)
       json (>= 1.4.0)
