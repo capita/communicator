@@ -1,3 +1,4 @@
+# Rake tasks for the communicator gem.
 namespace :communicator do
   desc "Copies all communicator gem migrations to your rails app"
   task :update_migrations do
@@ -12,5 +13,11 @@ namespace :communicator do
         puts "Copied #{File.basename(migration)} to your Rails apps' db/migrate folder. Please do rake db:migrate"
       end
     end
+  end
+  
+  desc "Runs Communicator::Client.push and Communicator::Client.pull in current Rails.env"
+  task :communicate do
+    Communicator::Client.push
+    Communicator::Client.pull
   end
 end
