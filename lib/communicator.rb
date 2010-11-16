@@ -76,6 +76,5 @@ if defined?(Rails)
     Communicator::Server.username = Communicator::Client.username = config[:username]
     Communicator::Server.password = Communicator::Client.password = config[:password]
     Communicator::Client.base_uri config[:base_uri]
-    Communicator.logger.info "Set up communicator from yaml config"
   end
 end
