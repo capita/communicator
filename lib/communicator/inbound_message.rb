@@ -43,8 +43,8 @@ class Communicator::InboundMessage < ActiveRecord::Base
   # Figure out who is the receiver of this message and process the message
   def process!
     return if processed_at.present? # Do not process if already processed!
-    source, message = JSON.parse(body).first
-    Communicator.receiver_for(source).find_or_initialize_by_id(message["id"]).process_message(message)
+    source, content = message_content.first
+    Communicator.receiver_for(source).find_or_initialize_by_id(content["id"]).process_message(content)
     self.processed_at = Time.now
     self.save!
   end
