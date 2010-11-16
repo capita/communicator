@@ -16,6 +16,7 @@ class Communicator::InboundMessage < ActiveRecord::Base
     inbound_msg = Communicator::InboundMessage.new(:body => json_message["body"])
     inbound_msg.id = json_message["id"]
     inbound_msg.save!
+    Communicator.logger.info "Created inbound message from json, local id is #{inbound_msg.id}"
     inbound_msg
   end
   
@@ -37,15 +38,19 @@ class Communicator::InboundMessage < ActiveRecord::Base
   end
   
   def message_content
-    JSON.parse(body).with_indifferent_access
+    @message_content ||= JSON.parse(body).with_indifferent_access
   end
   
   # Figure out who is the receiver of this message and process the message
   def process!
-    return if processed_at.present? # Do not process if already processed!
+    if processed_at.present? # Do not process if already processed!
+      Communicator.logger.info "InboundMessage #{id} has already been processed, not processing again!"
+      return false
+    end
     source, content = message_content.first
     Communicator.receiver_for(source).find_or_initialize_by_id(content["id"]).process_message(content)
     self.processed_at = Time.now
     self.save!
+    Communicator.logger.info "Processed inbound message #{id} successfully"
   end
 end

@@ -11,7 +11,20 @@ module Communicator
   # Error to be raised when no credentials were given
   class MissingCredentials < StandardError; end;
   
+  # Fake logger to be returned as Communicator.logger when Rails is unavailable
+  class FakeLogger
+    class << self
+      def method_missing(*args, &blk)
+        true
+      end
+    end
+  end
+  
   class << self
+    def logger
+      defined?(Rails) ? Rails.logger : Communicator::FakeLogger
+    end
+    
     # Hash containing all receivers
     def receivers
       @recevers ||= {}.with_indifferent_access
@@ -25,6 +38,7 @@ module Communicator
       target.send(:include, Communicator::ActiveRecordIntegration::InstanceMethods)
       
       target.skip_remote_attributes(*options[:except]) if options[:except]
+      Communicator.logger.info "Registered #{target} as receiver for messages from #{source}"
       
       target
     end
@@ -62,5 +76,6 @@ if defined?(Rails)
     Communicator::Server.username = Communicator::Client.username = config[:username]
     Communicator::Server.password = Communicator::Client.password = config[:password]
     Communicator::Client.base_uri config[:base_uri]
+    Communicator.logger.info "Set up communicator from yaml config"
   end
 end

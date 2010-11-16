@@ -30,12 +30,15 @@ module Communicator::ActiveRecordIntegration
     
     # Publishes this instance as an OutboundMessage with json representation as body
     def publish
-      Communicator::OutboundMessage.create!(:body => {self.class.to_s.underscore => attributes}.to_json)
+      msg = Communicator::OutboundMessage.create!(:body => {self.class.to_s.underscore => attributes}.to_json)
+      Communicator.logger.info "Publishing updates for #{self.class} ##{id}"
+      msg
     end
     
     # Processes the given message body by applying all contained attributes and their values
     # and saving. When the setter instance method is missing on the local record, skip that attribute.
     def process_message(input)
+      Communicator.logger.info "Processing json message content on #{self.class} ##{id}"
       # When the input is still json, parse it. Otherwise we're assuming it's already a demarshalled hash
       input = JSON.parse(input) if input.kind_of?(String)
       input.each do |attr_name, value|
