@@ -48,6 +48,9 @@ module Communicator::ActiveRecordIntegration
       end
       self.updated_from_message = true
       save!
+    rescue => err
+      Communicator.logger.warn "Failed to process message on #{self.class} ##{id}! Errors: #{self.errors.to_s}"
+      raise err
     end
   end
 end

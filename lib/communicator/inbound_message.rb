@@ -51,6 +51,9 @@ class Communicator::InboundMessage < ActiveRecord::Base
     Communicator.receiver_for(source).find_or_initialize_by_id(content["id"]).process_message(content)
     self.processed_at = Time.now
     self.save!
-    Communicator.logger.info "Processed inbound message #{id} successfully"
+    Communicator.logger.info "Processed inbound message ##{id} successfully"
+  rescue => err
+    Communicator.logger.warn "Failed to store inbound message ##{id}! Errors: #{self.errors.to_s}"
+    raise err
   end
 end
