@@ -53,7 +53,7 @@ class Communicator::InboundMessage < ActiveRecord::Base
     self.save!
     Communicator.logger.info "Processed inbound message ##{id} successfully"
   rescue => err
-    Communicator.logger.warn "Failed to store inbound message ##{id}! Errors: #{self.errors.to_s}"
+    Communicator.logger.warn "Failed to store inbound message ##{id}! Errors: #{self.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}"
     raise err
   end
 end
