@@ -16,7 +16,7 @@ namespace :communicator do
   end
   
   desc "Runs Communicator::Client.push and Communicator::Client.pull in current Rails.env"
-  task :communicate do
+  task :communicate => :environment do
     Communicator::Client.push
     Communicator::Client.pull
   end
