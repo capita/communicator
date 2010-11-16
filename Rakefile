@@ -14,7 +14,6 @@ begin
     gem.add_dependency 'activerecord', "< 3.0.0"
     gem.add_dependency 'httparty', '>= 0.6.1'
     gem.add_dependency 'json', '>= 1.4.0'
-    
     gem.add_development_dependency "shoulda", "2.10.3"
     gem.add_development_dependency 'factory_girl', ">= 1.2.3"
     gem.add_development_dependency 'rack-test', ">= 0.5.6"
