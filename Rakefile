@@ -1,16 +1,15 @@
 require 'rubygems'
 require 'rake'
-require "open3"
 
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name        = "communicator"
-    gem.summary     = %Q{Data push/pull between apps with local inbound/outbound queue and easy publish/process interface}
+    gem.name = "communicator"
+    gem.summary = %Q{Data push/pull between apps with local inbound/outbound queue and easy publish/process interface}
     gem.description = %Q{Data push/pull between apps with local inbound/outbound queue and easy publish/process interface}
-    gem.email       = "christoph at olszowka de"
-    gem.homepage    = "http://github.com/colszowka/communicator"
-    gem.authors     = ["Christoph Olszowka"]
+    gem.email = "christoph at olszowka de"
+    gem.homepage = "http://github.com/colszowka/communicator"
+    gem.authors = ["Christoph Olszowka"]
     gem.add_dependency 'sinatra', "~> 1.1.0"
     gem.add_dependency 'activerecord', "< 3.0.0"
     gem.add_dependency 'httparty', '>= 0.6.1'
@@ -29,16 +28,17 @@ rescue LoadError
 end
 
 
+
 namespace :db do
   desc "Drop, create and migrate the test databases"
   task :migrate do
     require 'active_record'
     # Drop existing db
     system "rm db/*.sqlite3"
-    dev_null                        = File.new('/dev/null', 'w')
-    ActiveRecord::Base.logger       = Logger.new(dev_null)
+    dev_null = File.new('/dev/null', 'w')
+    ActiveRecord::Base.logger = Logger.new(dev_null)
     ActiveRecord::Migration.verbose = false
-
+  
     # Create and migrate test databases for server and client
     %w(test_client test_server).each do |db_name|
       ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "db/#{db_name}.sqlite3")
@@ -51,42 +51,16 @@ end
 namespace :test_server do
   desc "Starts the test server"
   task :start do
-    debug = ENV['DEBUG'] ? true : false
-    cmd   = "bundle exec rackup test/config.ru -p 20359 --pid=#{File.join(File.dirname(__FILE__), 'test', 'rack.pid')}"
-
-    if not debug
-      server = Thread.new do
-        print 'Starting up the test server '
-        STDOUT.flush
-
-        # Fire up the server process and wait for it to be ready to serve requests
-        Open3.popen3(cmd) do |stdin, stdout, stderr|
-          while line = stderr.gets
-            if line =~ /port=20359/
-              puts " done!"
-              STDOUT.flush
-              break
-            else
-              print '.'
-              STDOUT.flush
-            end
-          end
-        end
-
-        # Comment above call to popen3 and uncomment the following block to see the actual server's output.
-        # Bear in mind that you might need to adjust the sleep's duration for the server to be ready
-        #`#{rackup}`
-        # sleep 10.0
-      end
-      server.join
-    else
-      Thread.new do
-        puts 'Starting up the test server (DEBUG)'
-        `#{cmd}`
-      end
-      sleep 10
+    Thread.new do
+      # Capture sinatra output (to hide it away...)
+      require "open3"
+      rackup = "bundle exec rackup test/config.ru -p 20359 --pid=#{File.join(File.dirname(__FILE__), 'test', 'rack.pid')}"
+      Open3.popen3(rackup)
+      #`#{rackup}` # Uncomment to see actual server output
+      
     end
-
+    sleep 2.0
+  
     Kernel.at_exit do
       Rake::Task["test_server:stop"].invoke
     end
@@ -120,10 +94,10 @@ task :default => :test
 
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
-  version       = File.exist?('VERSION') ? File.read('VERSION') : ""
+  version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = "communicator #{version}"
+  rdoc.title = "communicator #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
