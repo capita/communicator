@@ -17,7 +17,16 @@ namespace :communicator do
   
   desc "Runs Communicator::Client.push and Communicator::Client.pull in current Rails.env"
   task :communicate => :environment do
-    Communicator::Client.push
-    Communicator::Client.pull
+    begin
+      Communicator::Client.push
+    rescue => err
+      report_exception err, "Status" => "Sync failed while trying to PUSH messages"
+    end
+    
+    begin
+      Communicator::Client.pull
+    rescue => err
+      report_exception err, "Status" => "Sync failed while trying to PULL messages"
+    end
   end
 end

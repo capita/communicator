@@ -18,6 +18,15 @@ class Communicator::InboundMessage < ActiveRecord::Base
     inbound_msg.save!
     Communicator.logger.info "Created inbound message from json, local id is #{inbound_msg.id}"
     inbound_msg
+    
+  rescue => err
+    if respond_to?(:report_exception)
+      report_exception err, "Validation Errors" => "Errors: #{inbound_msg.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}", 
+        "Inbound Message Record" => inbound_msg.attributes.inspect, 
+        "JSON Message" => json_message.inspect
+    end
+    
+    raise err
   end
   
   # Expects an already demarshalled collection array containing remote message data, which
@@ -52,8 +61,16 @@ class Communicator::InboundMessage < ActiveRecord::Base
     self.processed_at = Time.now
     self.save!
     Communicator.logger.info "Processed inbound message ##{id} successfully"
+    
   rescue => err
     Communicator.logger.warn "Failed to store inbound message ##{id}! Errors: #{self.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}"
+
+    if respond_to?(:report_exception)
+      report_exception err, "Validation Errors" => "Errors: #{self.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}", 
+        "Inbound Message" => self.attributes.inspect, 
+        "JSON Content" => self.message_content.inspect
+    end    
+    
     raise err
   end
 end
