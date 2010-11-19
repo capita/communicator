@@ -21,12 +21,20 @@ namespace :communicator do
       Communicator::Client.push
     rescue => err
       report_exception err, "Status" => "Sync failed while trying to PUSH messages"
+      raise err
     end
     
     begin
       Communicator::Client.pull
     rescue => err
       report_exception err, "Status" => "Sync failed while trying to PULL messages"
+      raise err
     end
+  end
+  
+  desc "Purges inbound and outbound messages - USE WITH CAUTION!!"
+  task :purge => :environment do
+    Communicator::InboundMessage.delete_all
+    Communicator::OutboundMessage.delete_all
   end
 end
