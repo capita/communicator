@@ -28,7 +28,7 @@ class TestClient < Test::Unit::TestCase
     setup do
       Communicator::Client.username = 'testuser'
       Communicator::Client.password = 'pwd'
-      Communicator::Client.base_uri 'localhost:20359'
+      Communicator::Client.base_uri '127.0.0.1:20359'
     end
     
     context "PUSH" do
