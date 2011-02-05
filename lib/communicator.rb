@@ -66,6 +66,7 @@ require 'communicator/client'
 require 'communicator/active_record_integration'
 require 'communicator/outbound_message'
 require 'communicator/inbound_message'
+require 'communicator/version'
 
 # Autoload config when present for rails
 if defined?(Rails)
