@@ -38,31 +38,25 @@ end
 namespace :test_server do
   desc "Starts the test server"
   task :start do
-    Thread.new do
-      # Capture sinatra output (to hide it away...)
-      require "open3"
-      rackup = "bundle exec rackup test/config.ru -p 20359 --pid=#{File.join(File.dirname(__FILE__), 'test', 'rack.pid')}"
-      Open3.popen3(rackup)
-      #`#{rackup}` # Uncomment to see actual server output
-      
+    # For background on what is going on here, please have a look at:
+    # http://stackoverflow.com/questions/1993071/how-to-controller-start-kill-a-background-process-server-app-in-ruby
+    # http://stackoverflow.com/questions/224512/redirect-the-puts-command-output-to-a-log-file
+    
+    pid = fork do
+      $stdout.reopen("tmp/test_server.log", "w+")
+      $stdout.sync = true
+      $stderr.reopen($stdout)
+      exec "bundle exec rackup test/config.ru -p 20359"
     end
+
     sleep 2.0
   
     Kernel.at_exit do
-      Rake::Task["test_server:stop"].invoke
+      Process.kill "KILL", pid
+      Process.wait pid
     end
   end
 
-  desc "Stops the test server"
-  task :stop do
-    begin
-      pid = File.read(File.join(File.dirname(__FILE__), 'test', 'rack.pid')).strip.chomp
-      `kill -s KILL #{pid}`
-      puts "Killed test server with PID #{pid}"
-    rescue => err
-      puts "Nothing to stop..."
-    end
-  end
 end
 
 # Make sure database and test server are in place when tests start
