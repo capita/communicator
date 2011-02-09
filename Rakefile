@@ -46,6 +46,7 @@ namespace :test_server do
     server_port = 20000+rand(2000)
     
     pid = fork do
+      system("touch tmp/test_server.log") # Make sure log file exists in tmp for 1.9
       $stdout.reopen("tmp/test_server.log", "w+")
       $stdout.sync = true
       $stderr.reopen($stdout)
