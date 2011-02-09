@@ -61,6 +61,7 @@ namespace :test_server do
     sleep 10
   
     Kernel.at_exit do
+      system("rm tmp/*")
       Process.kill "KILL", pid
       Process.wait pid
     end
