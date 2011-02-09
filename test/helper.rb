@@ -53,5 +53,8 @@ class Test::Unit::TestCase
   # from the tempfile...
   def server_port
     File.read(File.join(File.dirname(__FILE__), '../tmp/server_port')).strip.chomp
+  rescue => err
+    err.message = "Failed to retrieve test server port. Are you sure test server is running? #{err.message}"
+    raise err
   end
 end
