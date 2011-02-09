@@ -73,6 +73,7 @@ namespace :test_server do
     puts
   
     Kernel.at_exit do
+      puts File.read('tmp/test_server.log')
       system("rm tmp/*")
       Process.kill "KILL", pid
       Process.wait pid
