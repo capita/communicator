@@ -48,4 +48,10 @@ class Test::Unit::TestCase
     TestServerDatabase::Post.delete_all
     TestServerDatabase::Comment.delete_all
   end
+  
+  # Retrieves the test server port that is generated randomly (see Rakefile)
+  # from the tempfile...
+  def server_port
+    File.read(File.join(File.dirname(__FILE__), '../tmp/server_port')).strip.chomp
+  end
 end

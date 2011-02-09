@@ -42,14 +42,21 @@ namespace :test_server do
     # http://stackoverflow.com/questions/1993071/how-to-controller-start-kill-a-background-process-server-app-in-ruby
     # http://stackoverflow.com/questions/224512/redirect-the-puts-command-output-to-a-log-file
     
+    # Dynamically choose a port to use so tests can run concurrently!
+    server_port = 20000+rand(2000)
+    
     pid = fork do
       $stdout.reopen("tmp/test_server.log", "w+")
       $stdout.sync = true
       $stderr.reopen($stdout)
-      exec "bundle exec rackup test/config.ru -p 20359"
+      # Write the port into a tempfile so tests can figure out where to run against!
+      File.open('tmp/server_port', "w+") do |f|
+        f.print server_port
+      end
+      exec "bundle exec rackup test/config.ru -p #{server_port}"
     end
 
-    puts "Waiting 10 seconds for test server to start"
+    puts "Waiting 10 seconds for test server to start on localhost:#{server_port}"
     sleep 10
   
     Kernel.at_exit do

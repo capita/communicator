@@ -2,8 +2,8 @@ require 'helper'
 
 #
 # Unit tests for client and it's interaction with the real server running in background
-# on port 20359. For introspection purposes, a simple second database connection
-# has been established as TestServerDatabase
+# For introspection purposes, a simple second database connection has been established 
+# as TestServerDatabase
 #
 class TestClient < Test::Unit::TestCase
   context "Without auth credentials configured" do
@@ -28,7 +28,7 @@ class TestClient < Test::Unit::TestCase
     setup do
       Communicator::Client.username = 'testuser'
       Communicator::Client.password = 'pwd'
-      Communicator::Client.base_uri 'localhost:20359'
+      Communicator::Client.base_uri "localhost:#{server_port}"
     end
     
     context "PUSH" do
