@@ -29,6 +29,7 @@ class TestClient < Test::Unit::TestCase
       Communicator::Client.username = 'testuser'
       Communicator::Client.password = 'pwd'
       Communicator::Client.base_uri "localhost:#{server_port}"
+      sleep 1 # DEBUG testing overload of test server in CI
     end
     
     context "PUSH" do
@@ -132,7 +133,7 @@ class TestClient < Test::Unit::TestCase
         assert_equal 'some comment', TestServerDatabase::Comment.first.body
       end
       
-      should "have skipped permissions attribute when processing at remote" do
+      should "have skipped title attribute when processing at remote" do
         assert_nil TestServerDatabase::Comment.first.title
       end
     end
