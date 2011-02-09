@@ -49,7 +49,8 @@ namespace :test_server do
       exec "bundle exec rackup test/config.ru -p 20359"
     end
 
-    sleep 2.0
+    puts "Waiting 10 seconds for test server to start"
+    sleep 10
   
     Kernel.at_exit do
       Process.kill "KILL", pid
