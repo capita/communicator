@@ -5,10 +5,9 @@ Rails apps.
 
 == Setup
 
-Install in Rails apps with:
+Install in Rails apps by adding this to your Gemfile:
 
   gem 'communicator'
-  $ bundle install
   
 Import rake tasks in your Rails.root/Rakefile:
 
@@ -97,6 +96,11 @@ will arrive at the other side when a client pulls or pushes.
 When an update is received from a remote side, the message will be stored in
 `inbound_messages` and the received changes will be applied to the local record,
 either updating existing or creating new records.
+
+== Compatibility
+
+Communicator is currently only proven to work on Rails 2 apps using either
+REE, 1.8.7, 1.9.1 or 1.9.2. 
 
 == Note on Patches/Pull Requests
  
