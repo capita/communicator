@@ -29,6 +29,11 @@ class Communicator::Client
       verify_response request.response
       Communicator::InboundMessage.create_from_json_collection!(JSON.parse(request.parsed_response))
       request
+      
+    # Customize error message on HTTP Timeout
+    rescue Timeout::Error => err
+      err.message = err.message + " - Failed to PULL from #{base_uri}"
+      raise err
     end
   
     def push(from_id=nil)
@@ -46,6 +51,11 @@ class Communicator::Client
       else
         raise "Could not agree upon from_id with server!"
       end
+      
+    # Customize error message on HTTP Timeout
+    rescue Timeout::Error => err
+      err.message = err.message + " - Failed to PUSH to #{base_uri}"
+      raise err
     end
     
     def verify_response(response)

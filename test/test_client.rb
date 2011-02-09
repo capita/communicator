@@ -29,7 +29,6 @@ class TestClient < Test::Unit::TestCase
       Communicator::Client.username = 'testuser'
       Communicator::Client.password = 'pwd'
       Communicator::Client.base_uri "localhost:#{server_port}"
-      sleep 1 # DEBUG testing overload of test server in CI
     end
     
     context "PUSH" do
