@@ -43,10 +43,10 @@ namespace :test_server do
     # http://stackoverflow.com/questions/224512/redirect-the-puts-command-output-to-a-log-file
     
     # Dynamically choose a port to use so tests can run concurrently!
-    server_port = 20000+rand(2000)
+    server_port = 20000+rand(5000)
     
     # Clean up tmp dir and make sure test_server.log file exists
-    system("rm tmp/*")
+    Dir["tmp/*"].each {|f| system("rm #{f}")}
     system("touch tmp/test_server.log")
     
     pid = fork do
@@ -66,8 +66,11 @@ namespace :test_server do
     while retries += 1 and not File.read('tmp/test_server.log') =~ /HTTPServer/
       print '.'
       sleep 1
-      fail "Test server did not start in time, exiting..." if retries > 20
+      if retries > 25
+        fail "Test server did not start in time! Log output was:\n---------\n#{File.read('tmp/test_server.log')}----------"
+      end
     end
+    puts
   
     Kernel.at_exit do
       system("rm tmp/*")
