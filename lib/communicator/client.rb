@@ -32,9 +32,7 @@ class Communicator::Client
       
     # Customize error message on HTTP Timeout
     rescue Timeout::Error => err
-      err = err.dup
-      err.message << " - Failed to PULL from #{base_uri}"
-      raise err
+      raise Timeout::Error, "Failed to PULL from #{base_uri} - Request timed out!"
     end
   
     def push(from_id=nil)
@@ -55,9 +53,7 @@ class Communicator::Client
       
     # Customize error message on HTTP Timeout
     rescue Timeout::Error => err
-      err = err.dup
-      err.message << " - Failed to PUSH to #{base_uri}"
-      raise err
+      raise Timeout::Error, "Failed to PUSH to #{base_uri} - Request timed out!"
     end
     
     def verify_response(response)
