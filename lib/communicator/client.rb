@@ -32,7 +32,7 @@ class Communicator::Client
       
     # Customize error message on HTTP Timeout
     rescue Timeout::Error => err
-      err.message = err.message + " - Failed to PULL from #{base_uri}"
+      err.message << " - Failed to PULL from #{base_uri}"
       raise err
     end
   
@@ -54,7 +54,7 @@ class Communicator::Client
       
     # Customize error message on HTTP Timeout
     rescue Timeout::Error => err
-      err.message = err.message + " - Failed to PUSH to #{base_uri}"
+      err.message << " - Failed to PUSH to #{base_uri}"
       raise err
     end
     
