@@ -5,6 +5,7 @@ class Communicator::Client
   class InvalidStartingId < StandardError; end;
 
   include HTTParty
+  default_timeout 10
   
   class << self
     attr_writer :username, :password
