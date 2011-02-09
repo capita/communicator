@@ -45,8 +45,11 @@ namespace :test_server do
     # Dynamically choose a port to use so tests can run concurrently!
     server_port = 20000+rand(2000)
     
+    # Clean up tmp dir and make sure test_server.log file exists
+    system("rm tmp/*")
+    system("touch tmp/test_server.log")
+    
     pid = fork do
-      system("touch tmp/test_server.log") # Make sure log file exists in tmp for 1.9
       $stdout.reopen("tmp/test_server.log", "w+")
       $stdout.sync = true
       $stderr.reopen($stdout)
@@ -54,11 +57,17 @@ namespace :test_server do
       File.open('tmp/server_port', "w+") do |f|
         f.print server_port
       end
-      exec "bundle exec rackup test/config.ru -p #{server_port}"
+      exec "bundle exec rackup test/config.ru -s webrick -p #{server_port}"
     end
 
-    puts "Waiting 10 seconds for test server to start on localhost:#{server_port}"
-    sleep 10
+    # Wait for WEBrick to boot...
+    retries = 0
+    print "Waiting for test server to start on localhost:#{server_port}"
+    while retries += 1 and not File.read('tmp/test_server.log') =~ /HTTPServer/
+      print '.'
+      sleep 1
+      fail "Test server did not start in time, exiting..." if retries > 20
+    end
   
     Kernel.at_exit do
       system("rm tmp/*")
