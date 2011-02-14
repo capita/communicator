@@ -121,6 +121,31 @@ class TestClient < Test::Unit::TestCase
       end
     end
     
+    # Ensure that we can delegate ID sequence processing to the remote by publishing
+    # an unpersisted record
+    context "After publishing a not-yet saved Post (that has no ID therefore)" do
+      setup do
+        @post = Post.new(:title => 'foo', :body => 'unpersisted post')
+        assert @post.publish
+      end
+      
+      should "have created an Outbound Message that has a nil ID" do
+        assert_nil Communicator::OutboundMessage.last.message_content["post"]["id"]
+      end
+      
+      context "after PUSH" do
+        setup do
+          Communicator::Client.push
+        end
+        
+        should "have created the post in the server DB" do
+          remote_post = TestServerDatabase::Post.last
+          assert_equal 'unpersisted post', remote_post.body
+          assert remote_post.id > 0
+        end
+      end
+    end
+    
     # Make sure attributes skipped with :except are not saved at remote
     context "PUSHing a new comment" do
       setup do
