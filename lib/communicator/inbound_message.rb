@@ -57,7 +57,16 @@ class Communicator::InboundMessage < ActiveRecord::Base
       return false
     end
     source, content = message_content.first
-    Communicator.receiver_for(source).find_or_initialize_by_id(content["id"]).process_message(content)
+    
+    # We have to distinguish here between inbound messages that have an id and those that
+    # don't since some databases (at least Postgres) will raise an error when the ID is set to nil on
+    # the ActiveRecord instance because AR includes the id column and it's "NULL" value in the
+    # INSERT statement
+    if content["id"]
+      Communicator.receiver_for(source).find_or_initialize_by_id(content["id"]).process_message(content)
+    else
+      Communicator.receiver_for(source).new.process_message(content)
+    end
     self.processed_at = Time.now
     self.save!
     Communicator.logger.info "Processed inbound message ##{id} successfully"
