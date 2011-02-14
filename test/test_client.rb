@@ -133,6 +133,10 @@ class TestClient < Test::Unit::TestCase
         assert_nil Communicator::OutboundMessage.last.message_content["post"]["id"]
       end
       
+      should "not have created the Post locally" do
+        assert @post.new_record?
+      end
+      
       context "after PUSH" do
         setup do
           Communicator::Client.push
