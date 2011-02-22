@@ -20,10 +20,11 @@ class Communicator::InboundMessage < ActiveRecord::Base
     inbound_msg
     
   rescue => err
-    if respond_to?(:report_exception)
-      report_exception err, "Validation Errors" => "Errors: #{inbound_msg.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}", 
-        "Inbound Message Record" => inbound_msg.attributes.inspect, 
-        "JSON Message" => json_message.inspect
+    # Add context to exception when using capita/exception_notification fork
+    if err.respond_to?(:context)
+      err.context["Validation Errors"] = "Errors: #{inbound_msg.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}"
+      err.context["Inbound Message"] = inbound_msg.attributes.inspect
+      err.context["JSON Message"] = json_message.inspect
     end
     
     raise err
@@ -74,11 +75,12 @@ class Communicator::InboundMessage < ActiveRecord::Base
   rescue => err
     Communicator.logger.warn "Failed to store inbound message ##{id}! Errors: #{self.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}"
 
-    if respond_to?(:report_exception)
-      report_exception err, "Validation Errors" => "Errors: #{self.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}", 
-        "Inbound Message" => self.attributes.inspect, 
-        "JSON Content" => self.message_content.inspect
-    end    
+    # Add context to exception when using capita/exception_notification fork
+    if err.respond_to?(:context)
+      err.context["Validation Errors"] = "Errors: #{self.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}"
+      err.context["Inbound Message"] = self.attributes.inspect
+      err.context["JSON Content"] = self.message_content.inspect
+    end
     
     raise err
   end

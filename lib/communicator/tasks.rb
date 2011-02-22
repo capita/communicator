@@ -20,16 +20,18 @@ namespace :communicator do
     begin
       Communicator::Client.push
     rescue => err
-      report_exception err, "Status" => "Sync failed while trying to PUSH messages"
-      raise err
+      Communicator::ExceptionHandler.publish_and_reraise err, "Status" => "Sync failed while trying to PUSH messages"
     end
     
     begin
       Communicator::Client.pull
     rescue => err
-      report_exception err, "Status" => "Sync failed while trying to PULL messages"
-      raise err
+      Communicator::ExceptionHandler.publish_and_reraise err, "Status" => "Sync failed while trying to PULL messages"
     end
+    
+    # If everything's fine, make sure exception notifications are unlocked and get 
+    # delivered again on next occurence
+    Communicator::ExceptionHandler.unlock!
   end
   
   desc "Purges inbound and outbound messages - USE WITH CAUTION!!"

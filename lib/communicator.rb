@@ -10,6 +10,14 @@ module Communicator
   
   # Error to be raised when no credentials were given
   class MissingCredentials < StandardError; end;
+    
+  autoload :Server, 'communicator/server'
+  autoload :Client, 'communicator/client'
+  autoload :ExceptionHandler, 'communicator/exception_handler'
+  autoload :ActiveRecordIntegration, 'communicator/active_record_integration'
+  autoload :OutboundMessage, 'communicator/outbound_message'
+  autoload :InboundMessage, 'communicator/inbound_message'
+  autoload :Version, 'communicator/version'
   
   # Fake logger to be returned as Communicator.logger when Rails is unavailable
   class FakeLogger
@@ -61,14 +69,10 @@ module Communicator
   end
 end
 
-require 'communicator/server'
-require 'communicator/client'
-require 'communicator/active_record_integration'
-require 'communicator/outbound_message'
-require 'communicator/inbound_message'
-require 'communicator/version'
+# Include class methods into active record base
+ActiveRecord::Base.send :extend, Communicator::ActiveRecordIntegration::ClassMethods
 
-# Autoload config when present for rails
+# Autoload config from yaml when present for rails
 if defined?(Rails)
   config_path = File.join(Rails.root, 'config', 'communicator.yml')
   if File.exist?(config_path)

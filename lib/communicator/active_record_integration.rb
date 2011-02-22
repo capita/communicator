@@ -51,14 +51,11 @@ module Communicator::ActiveRecordIntegration
       
     rescue => err
       Communicator.logger.warn "Failed to process message on #{self.class} ##{id}! Errors: #{self.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}"
-      if respond_to?(:report_exception)
-        report_exception err, "Validation Errors" => "Errors: #{self.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}", "JSON Input" => input.inspect
+      if err.respond_to?(:context)
+        err.context["Validation Errors"] = "Errors: #{self.errors.map{|k,v| "#{k}: #{v}"}.join(", ")}"
+        err.context["JSON Input"] = input.inspect
       end
       raise err
     end
   end
 end
-
-# Include class methods into active record base
-ActiveRecord::Base.send :extend, Communicator::ActiveRecordIntegration::ClassMethods
-
