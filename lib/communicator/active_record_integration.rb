@@ -1,6 +1,6 @@
 # ActiveRecord hooks for Communicator
 module Communicator::ActiveRecordIntegration
-  module ClassMethods
+  module Hook
     # Class method to register as a communicator receiver
     #
     # Usage (assuming you expect messages from "post"):
@@ -11,7 +11,9 @@ module Communicator::ActiveRecordIntegration
     def receives_from(source, options={})
       Communicator.register_receiver(self, source, options)
     end
-    
+  end
+
+  module ClassMethods
     def skipped_remote_attributes
       @skipped_remote_attributes ||= []
     end

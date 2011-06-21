@@ -57,8 +57,9 @@ module Communicator
     # message processing and publishing functionality is included
     def register_receiver(target, source, options={})
       receivers[source] = target
+      target.send(:extend, Communicator::ActiveRecordIntegration::ClassMethods)
       target.send(:include, Communicator::ActiveRecordIntegration::InstanceMethods)
-      
+
       target.skip_remote_attributes(*options[:except]) if options[:except]
       Communicator.logger.info "Registered #{target} as receiver for messages from #{source}"
       
@@ -84,7 +85,7 @@ module Communicator
 end
 
 # Include class methods into active record base
-ActiveRecord::Base.send :extend, Communicator::ActiveRecordIntegration::ClassMethods
+ActiveRecord::Base.send :extend, Communicator::ActiveRecordIntegration::Hook
 
 # Autoload config from yaml when present for rails
 if defined?(Rails)
