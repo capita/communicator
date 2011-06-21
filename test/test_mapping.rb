@@ -12,21 +12,29 @@ class TestMapping < Test::Unit::TestCase
       @post = Post.create!(:title => 'foo', :body => 'bar')
     end
 
-    context ", a mapping for this Post" do
+    context ", the mapping for this Post" do
       setup do
-        @mapping = Communicator::Mapping.create!(:origin => 'remote', :original_id => 72, :local_record => @post)
+        @mapping = @post.mapping
       end
 
       should "return the post as local_record" do
-        assert_equal @post, @mapping.reload.local_record
+        assert_equal @post, @mapping.local_record
       end
 
       should "return the mapping for the post" do
-        assert_equal @mapping, @post.reload.mapping
+        assert_equal @mapping, @post.mapping
       end
 
-      should "return the post for Post.find_for_mapping(:origin => 'remote', :original_id => 72)" do
-        assert_equal @post, Post.find_for_mapping(:origin => 'remote', :original_id => 72)
+      should "have set origin to 'local'" do
+        assert_equal 'local', @post.mapping.origin
+      end
+
+      should "have set original_id to the post's id" do
+        assert_equal @post.id, @post.mapping.original_id
+      end
+
+      should "return the post for Post.find_for_mapping(:origin => Communicator.name, :original_id => @post.id)" do
+        assert_equal @post, Post.find_for_mapping(:origin => Communicator.name, :original_id => @post.id)
       end
 
       should "return a new Post for Post.find_for_mapping(:origin => 'remote', :original_id => 76)" do

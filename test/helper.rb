@@ -32,6 +32,7 @@ class Test::Unit::TestCase
     # Reset communicator credentials every time
     Communicator.username = nil
     Communicator.password = nil
+    Communicator.name = 'local'
     Communicator::Client.base_uri nil
     
     # Purge the databases every time...

@@ -42,7 +42,13 @@ module Communicator::ActiveRecordIntegration
     def self.included(base)
       base.class_eval do
         has_one :mapping, :class_name => "Communicator::Mapping", :as => :local_record
+        after_create :add_local_mapping
       end
+    end
+
+    def add_local_mapping
+      create_mapping(:origin => Communicator.name, :original_id => id) unless mapping
+      true
     end
 
     # Publishes this instance as an OutboundMessage with json representation as body
