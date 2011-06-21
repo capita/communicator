@@ -17,6 +17,7 @@ module Communicator
   autoload :ActiveRecordIntegration, 'communicator/active_record_integration'
   autoload :OutboundMessage, 'communicator/outbound_message'
   autoload :InboundMessage, 'communicator/inbound_message'
+  autoload :Mapping, 'communicator/mapping'
   autoload :Version, 'communicator/version'
   
   # Fake logger to be returned as Communicator.logger when Rails is unavailable
