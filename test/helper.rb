@@ -37,6 +37,7 @@ class Test::Unit::TestCase
     # Purge the databases every time...
     Communicator::InboundMessage.delete_all
     Communicator::OutboundMessage.delete_all
+    Communicator::Mapping.delete_all
     Post.delete_all
     Comment.delete_all
     

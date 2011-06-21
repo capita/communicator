@@ -7,6 +7,9 @@ class CreateCommunicatorMappings < ActiveRecord::Migration
       t.integer :local_record_id, :null => false
       t.timestamps
     end
+
+    add_index :communicator_mappings, [:origin, :original_id], :unique => true, :name => 'remote_record_unique_index'
+    add_index :communicator_mappings, [:local_record_type, :local_record_id], :unique => true, :name => 'local_record_unique_index'
   end
 
   def self.down
