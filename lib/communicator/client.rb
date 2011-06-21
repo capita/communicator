@@ -8,20 +8,9 @@ class Communicator::Client
   default_timeout 10
   
   class << self
-    attr_writer :username, :password
-    # Return configured username for http auth basic or raise an error message if not configured
-    def username
-      @username || raise(Communicator::MissingCredentials.new("No Username specified for HTTP AUTH. Please configure using Communicator::Client.username='xyz'"))
-    end
-
-    # Return configured password for http auth basic or raise an error message if not configured    
-    def password
-      @password || raise(Communicator::MissingCredentials.new("No Password specified for HTTP AUTH. Please configure using Communicator::Client.password='xyz'"))
-    end
-    
     # Helper for basic auth in httparty-expected format for request options
     def credentials
-      {:username => username, :password => password}
+      {:username => Communicator.username, :password => Communicator.password}
     end
     
     def pull

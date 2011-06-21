@@ -29,6 +29,19 @@ module Communicator
   end
   
   class << self
+    attr_accessor :name
+
+    attr_writer :username, :password
+    # Return configured username for http auth basic or raise an error message if not configured
+    def username
+      @username || raise(Communicator::MissingCredentials.new("No Username specified for HTTP AUTH. Please configure using Communicator.username='xyz'"))
+    end
+
+    # Return configured password for http auth basic or raise an error message if not configured    
+    def password
+      @password || raise(Communicator::MissingCredentials.new("No Password specified for HTTP AUTH. Please configure using Communicator.password='xyz'"))
+    end
+
     def logger
       defined?(Rails) ? Rails.logger : Communicator::FakeLogger
     end
@@ -78,8 +91,9 @@ if defined?(Rails)
   if File.exist?(config_path)
     config = YAML.load_file(config_path).with_indifferent_access[Rails.env]
     puts "Config file for communicator found, but does not have configuration for env #{Rails.env}" unless config.kind_of?(Hash)
-    Communicator::Server.username = Communicator::Client.username = config[:username]
-    Communicator::Server.password = Communicator::Client.password = config[:password]
+    Communicator.name = config[:name]
+    Communicator.username = config[:username]
+    Communicator.password = config[:password]
     Communicator::Client.base_uri config[:base_uri]
   end
 end

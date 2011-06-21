@@ -10,7 +10,7 @@ ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "db/
 require 'lib/post'
 require 'lib/comment'
 
-Communicator::Server.username = 'testuser'
-Communicator::Server.password = 'pwd'
+Communicator.username = 'testuser'
+Communicator.password = 'pwd'
 
 run Communicator::Server

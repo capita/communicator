@@ -26,8 +26,8 @@ class TestClient < Test::Unit::TestCase
   
   context "with server configured" do
     setup do
-      Communicator::Client.username = 'testuser'
-      Communicator::Client.password = 'pwd'
+      Communicator.username = 'testuser'
+      Communicator.password = 'pwd'
       Communicator::Client.base_uri "localhost:#{server_port}"
     end
     

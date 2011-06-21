@@ -1,21 +1,6 @@
 require 'sinatra'
 
 class Communicator::Server < Sinatra::Base
-  # Configuration parameters
-  class << self
-    attr_writer :username, :password
-    
-    # Return configured username for http auth basic or raise an error message if not configured
-    def username
-      @username || raise("No Username specified for HTTP AUTH. Please configure using Communicator::Server.username='xyz'")
-    end
-
-    # Return configured password for http auth basic or raise an error message if not configured    
-    def password
-      @password || raise("No Password specified for HTTP AUTH. Please configure using Communicator::Server.password='xyz'")
-    end
-  end
-  
   helpers do
     def protected!
       unless authorized?
@@ -26,7 +11,7 @@ class Communicator::Server < Sinatra::Base
   
     def authorized?
       @auth ||=  Rack::Auth::Basic::Request.new(request.env)
-      @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == [Communicator::Server.username, Communicator::Server.password]
+      @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == [Communicator.username, Communicator.password]
     end
   end
 

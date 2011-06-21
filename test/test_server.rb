@@ -10,8 +10,8 @@ class TestServer < Test::Unit::TestCase
   include Rack::Test::Methods
   
   def app
-    Communicator::Server.username = 'someguy'
-    Communicator::Server.password = 'password'
+    Communicator.username = 'someguy'
+    Communicator.password = 'password'
     Communicator::Server
   end
 

@@ -30,12 +30,9 @@ require 'lib/test_server_database/outbound_message'
 class Test::Unit::TestCase
   def setup
     # Reset communicator credentials every time
-    Communicator::Client.username = nil
-    Communicator::Client.password = nil
+    Communicator.username = nil
+    Communicator.password = nil
     Communicator::Client.base_uri nil
-    
-    Communicator::Server.username = nil
-    Communicator::Server.password = nil
     
     # Purge the databases every time...
     Communicator::InboundMessage.delete_all
