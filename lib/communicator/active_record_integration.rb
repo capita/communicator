@@ -21,6 +21,15 @@ module Communicator::ActiveRecordIntegration
         skipped_remote_attributes << attr_name.to_sym
       end
     end
+
+    def find_for_mapping(conditions)
+      mapping = Communicator::Mapping.find(:first, :conditions => {:origin => conditions[:origin], :original_id => conditions[:original_id]})
+      if mapping
+        mapping.local_record
+      else
+        new
+      end
+    end
   end
   
   # Instance methods that are to be mixed in to receiver classes

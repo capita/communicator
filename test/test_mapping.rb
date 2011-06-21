@@ -21,6 +21,22 @@ class TestMapping < Test::Unit::TestCase
         assert_equal @post, @mapping.reload.local_record
       end
 
+      should "return the post for Post.find_for_mapping(:origin => 'remote', :original_id => 72)" do
+        assert_equal @post, Post.find_for_mapping(:origin => 'remote', :original_id => 72)
+      end
+
+      should "return a new Post for Post.find_for_mapping(:origin => 'remote', :original_id => 76)" do
+        assert new_post = Post.find_for_mapping(:origin => 'remote', :original_id => 76)
+        assert new_post.new_record?, "Should be a new record"
+        assert_equal Post, new_post.class
+      end
+
+      should "return a new Post for Post.find_for_mapping(:origin => 'source', :original_id => 72)" do
+        assert new_post = Post.find_for_mapping(:origin => 'source', :original_id => 72)
+        assert new_post.new_record?, "Should be a new record"
+        assert_equal Post, new_post.class
+      end
+
       should "raise a db error when trying to create a different mapping for the same post" do
         assert_raise ActiveRecord::StatementInvalid do
           Communicator::Mapping.create!(:origin => 'remote', :original_id => 73, :local_record => @post)
