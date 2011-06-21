@@ -21,6 +21,10 @@ class TestMapping < Test::Unit::TestCase
         assert_equal @post, @mapping.reload.local_record
       end
 
+      should "return the mapping for the post" do
+        assert_equal @mapping, @post.reload.mapping
+      end
+
       should "return the post for Post.find_for_mapping(:origin => 'remote', :original_id => 72)" do
         assert_equal @post, Post.find_for_mapping(:origin => 'remote', :original_id => 72)
       end
@@ -33,8 +37,17 @@ class TestMapping < Test::Unit::TestCase
 
       should "return a new Post for Post.find_for_mapping(:origin => 'source', :original_id => 72)" do
         assert new_post = Post.find_for_mapping(:origin => 'source', :original_id => 72)
+        new_post.title = 'Foo'
+        new_post.body = 'Bar'
+        
         assert new_post.new_record?, "Should be a new record"
         assert_equal Post, new_post.class
+        assert_equal Communicator::Mapping, new_post.mapping.class
+
+        assert new_post.save
+        new_post.reload
+        assert_equal 72, new_post.mapping.original_id
+        assert_equal 'source', new_post.mapping.origin
       end
 
       should "raise a db error when trying to create a different mapping for the same post" do

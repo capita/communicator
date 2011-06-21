@@ -27,7 +27,9 @@ module Communicator::ActiveRecordIntegration
       if mapping
         mapping.local_record
       else
-        new
+        record = new
+        record.build_mapping(:origin => conditions[:origin], :original_id => conditions[:original_id])
+        record
       end
     end
   end
@@ -36,7 +38,13 @@ module Communicator::ActiveRecordIntegration
   module InstanceMethods
     # Instance variable to store whether this instance has been updated from remote message
     attr_accessor :updated_from_message
-    
+
+    def self.included(base)
+      base.class_eval do
+        has_one :mapping, :class_name => "Communicator::Mapping", :as => :local_record
+      end
+    end
+
     # Publishes this instance as an OutboundMessage with json representation as body
     def publish
       msg = Communicator::OutboundMessage.create!(:body => {self.class.to_s.underscore => attributes}.to_json)
