@@ -12,5 +12,6 @@ require 'lib/comment'
 
 Communicator.username = 'testuser'
 Communicator.password = 'pwd'
+Communicator.name = 'remote'
 
 run Communicator::Server

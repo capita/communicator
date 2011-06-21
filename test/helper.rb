@@ -26,6 +26,7 @@ require 'lib/test_server_database/post'
 require 'lib/test_server_database/comment'
 require 'lib/test_server_database/inbound_message'
 require 'lib/test_server_database/outbound_message'
+require 'lib/test_server_database/mapping'
 
 class Test::Unit::TestCase
   def setup
@@ -44,6 +45,7 @@ class Test::Unit::TestCase
     
     TestServerDatabase::InboundMessage.delete_all
     TestServerDatabase::OutboundMessage.delete_all
+    TestServerDatabase::Mapping.delete_all
     TestServerDatabase::Post.delete_all
     TestServerDatabase::Comment.delete_all
   end

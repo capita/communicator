@@ -22,10 +22,10 @@ class TestMessageModels < Test::Unit::TestCase
   context "An inbound message for a post that does not exist locally yet" do
     setup do
       @message = Factory.create(:inbound_message)
-      @post = ::Post.find(JSON.parse(@message.body)["post"]["id"])
+      @post = ::Post.find_by_title!(JSON.parse(@message.body)["post"]["title"])
     end
     
-    should "have all attributes of the post matching those in the json body" do
+    should "have all attributes of the post matching those in the json body (except for id :)" do
       JSON.parse(@message.body)["post"].each do |attr_name, value|
         assert_equal @post.send(attr_name), value
       end
@@ -33,10 +33,13 @@ class TestMessageModels < Test::Unit::TestCase
     
     context "after another Inbound Message for the same Post" do
       setup do
-        @message = Factory.create(:inbound_message, :body => {
-          :post => { :id => @post.id, 
-                     :title => 'new title', 
-                     :body => 'new malarkey'} }.to_json)
+        @update_message = Factory.create(:inbound_message, 
+          :origin => @message.origin,
+          :original_id => @message.original_id,
+          :body => {
+            :post => { :id => @post.id, 
+                       :title => 'new title', 
+                       :body => 'new malarkey'} }.to_json)
         @post.reload
       end
       

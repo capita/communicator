@@ -14,7 +14,7 @@ class Communicator::OutboundMessage < ActiveRecord::Base
   
   # Stripped down content hash for json delivery
   def payload
-    {:id => id, :body => body}
+    {:id => id, :body => body, :origin => origin, :original_id => original_id}
   end
   
   # Will return the JSON-parsed content of this message's body

@@ -53,7 +53,7 @@ module Communicator::ActiveRecordIntegration
 
     # Publishes this instance as an OutboundMessage with json representation as body
     def publish
-      msg = Communicator::OutboundMessage.create!(:body => {self.class.to_s.underscore => attributes}.to_json, :original_id => mapping.try(:original_id), :origin => mapping.try(:origin))
+      msg = Communicator::OutboundMessage.create!(:body => {self.class.to_s.underscore => attributes.except(:id)}.to_json, :original_id => mapping.try(:original_id), :origin => mapping.try(:origin))
       Communicator.logger.info "Publishing updates for #{self.class} ##{id}"
       msg
     end

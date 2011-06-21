@@ -54,6 +54,8 @@ class TestClient < Test::Unit::TestCase
       
       should "have created an outbound message locally" do
         assert_equal 'local post', Communicator::OutboundMessage.first.message_content["post"]["body"]
+        assert_equal 'local', Communicator::OutboundMessage.first.origin
+        assert_equal @post.id, Communicator::OutboundMessage.first.original_id
         assert_nil Communicator::OutboundMessage.first.delivered_at
       end
       
@@ -99,7 +101,7 @@ class TestClient < Test::Unit::TestCase
         
         context "when an update message is created at remote" do
           setup do
-            @remote_msg = TestServerDatabase::OutboundMessage.create!(:body => {:post => {:id => @post.id, :title => 'new title', :body => 'remote body'}}.to_json)
+            @remote_msg = TestServerDatabase::OutboundMessage.create!(:origin => 'local', :original_id => @post.id, :body => {:post => {:title => 'new title', :body => 'remote body'}}.to_json)
           end
           
           context "a PULL" do
@@ -168,7 +170,7 @@ class TestClient < Test::Unit::TestCase
     
     context "when an update message is created at remote" do
       setup do
-        @remote_msg = TestServerDatabase::OutboundMessage.create!(:body => {:post => {:id => 25, :title => 'new title', :body => 'remote body'}}.to_json)
+        @remote_msg = TestServerDatabase::OutboundMessage.create!(:body => {:post => {:title => 'new title', :body => 'remote body'}}.to_json)
       end
       
       context "a PULL" do
@@ -177,7 +179,7 @@ class TestClient < Test::Unit::TestCase
         end
         
         should "result in a local post getting created" do
-          post = Post.find(25)
+          post = Post.find_by_title!('new title')
           assert_equal 'new title', post.title
           assert_equal 'remote body', post.body
         end

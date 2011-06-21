@@ -112,7 +112,7 @@ class TestServer < Test::Unit::TestCase
           assert_equal 1, Communicator::InboundMessage.count
         end
         should "have created the corresponding post" do
-          assert post = Post.find(1)
+          assert post = Post.find_by_title('foo')
           assert_equal 'foo', post.title
           assert_equal 'bar', post.body
         end
