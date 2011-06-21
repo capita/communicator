@@ -37,17 +37,8 @@ class TestMapping < Test::Unit::TestCase
 
       should "return a new Post for Post.find_for_mapping(:origin => 'source', :original_id => 72)" do
         assert new_post = Post.find_for_mapping(:origin => 'source', :original_id => 72)
-        new_post.title = 'Foo'
-        new_post.body = 'Bar'
-        
         assert new_post.new_record?, "Should be a new record"
         assert_equal Post, new_post.class
-        assert_equal Communicator::Mapping, new_post.mapping.class
-
-        assert new_post.save
-        new_post.reload
-        assert_equal 72, new_post.mapping.original_id
-        assert_equal 'source', new_post.mapping.origin
       end
 
       should "raise a db error when trying to create a different mapping for the same post" do
@@ -60,6 +51,40 @@ class TestMapping < Test::Unit::TestCase
         assert_raise ActiveRecord::StatementInvalid do
           Communicator::Mapping.create!(:origin => 'remote', :original_id => 72, :local_record => Post.create!(:title => 'foo2', :body => 'bar2'))
         end
+      end
+    end
+  end
+
+  context "Post.find_for_mapping(:origin => 'source', :original_id => 72)" do
+    setup do
+      @new_post = Post.find_for_mapping(:origin => 'source', :original_id => 72)
+      @new_post.title = 'Foo'
+      @new_post.body = 'Bar'
+    end
+
+    should("be a new record") { assert @new_post.new_record? }
+    should("have class Post") { assert_equal Post, @new_post.class }
+    should("have class Mapping") { assert_equal Communicator::Mapping, @new_post.mapping.class }
+
+    context "after save" do
+      setup do 
+        @new_post.save!
+      end
+
+      should "have stored the mapping" do
+        assert !@new_post.mapping.new_record?
+      end
+
+      should "have original_id 72 in mapping" do
+        assert_equal 72, @new_post.mapping.original_id
+      end
+
+      should "have origin 'source' in mapping" do
+        assert_equal 'source', @new_post.mapping.origin
+      end
+
+      should "find the new post with Post.find_for_mapping" do
+        assert_equal @new_post, Post.find_for_mapping(:origin => 'source', :original_id => 72)
       end
     end
   end
