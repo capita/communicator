@@ -3,9 +3,13 @@ Factory.sequence(:inbound_record_id) {|i| i}
 Factory.sequence(:outbound_record_id) {|i| i}
 
 Factory.define(:inbound_message, :class => Communicator::InboundMessage) do |f|
-  f.body { {:post => {:id => Factory.next(:inbound_record_id), :title => 'foo', :body => 'bar'}}.to_json }
+  f.origin 'remote'
+  f.original_id { Factory.next(:inbound_record_id) }
+  f.body {|m| {:post => {:id => m.original_id, :title => 'foo', :body => 'bar'}}.to_json }
 end
 
 Factory.define(:outbound_message, :class => Communicator::OutboundMessage) do |f|
-  f.body { {:post => {:id => Factory.next(:outbound_record_id), :title => 'foo', :body => 'bar'}}.to_json }
+  f.origin { Communicator.name }
+  f.original_id { Factory.next(:outbound_record_id) }
+  f.body {|m| {:post => {:id => m.original_id, :title => 'foo', :body => 'bar'}}.to_json }
 end

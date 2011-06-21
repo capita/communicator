@@ -19,7 +19,7 @@ class TestMessageModels < Test::Unit::TestCase
     end
   end
   
-  context "A inbound message for a post that does not exist locally yet" do
+  context "An inbound message for a post that does not exist locally yet" do
     setup do
       @message = Factory.create(:inbound_message)
       @post = ::Post.find(JSON.parse(@message.body)["post"]["id"])

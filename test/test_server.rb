@@ -105,7 +105,7 @@ class TestServer < Test::Unit::TestCase
       context "with 1 post in body" do
         setup do
           assert Communicator::InboundMessage.count == 0, "Should have no inbound"
-          post '/messages.json', [{:id => 1, :body => {:post => {:id => 1, :title => 'foo', :body => 'bar'}}.to_json}].to_json, auth_header('someguy', 'password')
+          post '/messages.json', [{:original_id => 1, :origin => 'remote', :id => 1, :body => {:post => {:id => 1, :title => 'foo', :body => 'bar'}}.to_json}].to_json, auth_header('someguy', 'password')
         end
         should("return accepted status") { assert_equal 202, last_response.status }
         should "have created the inbound message" do

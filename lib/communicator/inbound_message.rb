@@ -13,7 +13,7 @@ class Communicator::InboundMessage < ActiveRecord::Base
   
   # Creates an inbound message from a remote json hash
   def self.create_from_json!(json_message)
-    inbound_msg = Communicator::InboundMessage.new(:body => json_message["body"])
+    inbound_msg = Communicator::InboundMessage.new(:body => json_message["body"], :origin => json_message["origin"], :original_id => json_message["original_id"])
     inbound_msg.id = json_message["id"]
     inbound_msg.save!
     Communicator.logger.info "Created inbound message from json, local id is #{inbound_msg.id}"
