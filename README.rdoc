@@ -3,6 +3,11 @@
 A simple communication layer to keep database records in sync between two
 Rails apps.
 
+The idea is that when you have a central application in a private network
+and a facade in a public network, the facade should not need to access the
+central application directly. Rather, the central application should manage
+communications for both applications. That is what Communicator does for you.
+
 == Setup
 
 Install in Rails apps by adding this to your Gemfile:
@@ -45,11 +50,10 @@ when you `require 'communicator'`.
 
 You can also skip the YAML configuration and set up the credentials programmatically:
 
-  Communicator::Server.username = 'foo'
-  Communicator::Server.password = 'bar'
+  Communicator.name = 'facade'
+  Communicator.username = 'foo'
+  Communicator.password = 'bar'
   
-  Communicator::Client.username = 'foo'
-  Communicator::Client.password = 'bar'
   Communicator::Client.base_uri 'localhost:1234'
   
 == Server side
@@ -96,6 +100,38 @@ will arrive at the other side when a client pulls or pushes.
 When an update is received from a remote side, the message will be stored in
 `inbound_messages` and the received changes will be applied to the local record,
 either updating existing or creating new records.
+
+== Automation
+
+Use a cron job or whatever else you use for scheduling tasks in your system. There is a rake
+task that does what you usually need:
+
+rake communicator:communicate
+
+Frequency of execution depends on your application's needs, of course. For us, every other
+minute in production (and every minute in acceptance testing) works just fine.
+
+== Upgrade and/or Model Structure Changes
+
+When the structure of one of the models whose data you transfer changes or when Communicator
+itself changes, the following steps should provide a safe path forward:
+
+1. Unschedule the rake task.
+2. Stop your applications, both the facade and the central application. This ensures that no
+new messages get added to your inbound and outbound queues.
+3. Manually execute push and pull until no further pending messages exist. Now we have reached
+a point where the system is temporarily quiescent and (message-)stable.
+4. Optionally remove all messages from the queues. You might wish not to leave any messages
+around whose format cannot be processed automatically any more. On the other hand, you might
+wish to keep them available for reference. Your call.
+5. Upgrade Communicator and/or your application.
+6. Reschedule the rake task.
+7. Start up your applications.
+
+This is actually a lot less complicated than it looks at first glance. The point is that if
+any of the underlying structures changes, you cannot have any messages in flight, because you
+would not be able to process them any more after the change. So you need to make sure all
+pending messages have been processed and no new ones are being generated.
 
 == Compatibility
 
