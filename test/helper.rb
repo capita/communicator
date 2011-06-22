@@ -13,8 +13,15 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'communicator'
 require 'factories'
 
-# Connect to client test database
-ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "db/test_client.sqlite3")
+# Connect to in-memory client test database and migrate it
+# Got to do this here for the client instead of rakefile as with the server since we need to
+# hold on to our sqlite memory db connection
+ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ":memory:")
+ActiveRecord::Base.logger = Logger.new(File.new('/dev/null', 'w'))
+ActiveRecord::Migration.verbose = false
+ActiveRecord::Migrator.migrate('db/migrate')
+ActiveRecord::Migrator.migrate('test/migrate')
+
 require 'lib/post'
 require 'lib/comment'
 

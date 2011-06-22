@@ -16,22 +16,19 @@ RDoc::Task.new do |rdoc|
 end
 
 namespace :db do
-  desc "Drop, create and migrate the test databases"
+  desc "Drop, create and migrate the test server database"
   task :migrate do
     require 'active_record'
     require 'logger'
     # Drop existing db
     system "rm db/*.sqlite3"
-    dev_null = File.new('/dev/null', 'w')
-    ActiveRecord::Base.logger = Logger.new(dev_null)
+    ActiveRecord::Base.logger = Logger.new(File.new('/dev/null', 'w'))
     ActiveRecord::Migration.verbose = false
   
     # Create and migrate test databases for server and client
-    %w(test_client test_server).each do |db_name|
-      ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "db/#{db_name}.sqlite3")
-      ActiveRecord::Migrator.migrate('db/migrate')
-      ActiveRecord::Migrator.migrate('test/migrate')
-    end
+    ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "db/#{db_name}.sqlite3")
+    ActiveRecord::Migrator.migrate('db/migrate')
+    ActiveRecord::Migrator.migrate('test/migrate')
   end
 end
 
