@@ -120,9 +120,11 @@ itself changes, the following steps should provide a safe path forward:
 2. Stop your applications, both the facade and the central application. This ensures that no new messages get added to your inbound and outbound queues.
 3. Manually execute push and pull until no further pending messages exist. Now we have reached a point where the system is temporarily quiescent and (message-)stable.
 4. Optionally remove all messages from the queues. You might wish not to leave any messages around whose format cannot be processed automatically any more. On the other hand, you might wish to keep them available for reference. Your call.
-5. Upgrade Communicator and/or your application.
-6. Reschedule the rake task.
-7. Start up your applications.
+5. Upgrade Communicator.
+6. Excute the rake task for copying migrations (if any) in both of your applications: rake communicator:update_migrations
+7. Upgrade your applications. If any migrations were copied in step 6, execute them.
+8. Reschedule the rake task for automation.
+9. Start up your applications.
 
 This is actually a lot less complicated than it looks at first glance. The point is that if
 any of the underlying structures changes, you cannot have any messages in flight, because you
