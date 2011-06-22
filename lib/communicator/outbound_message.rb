@@ -3,6 +3,7 @@ class Communicator::OutboundMessage < ActiveRecord::Base
   validates_presence_of :body
   
   named_scope :undelivered, :conditions => {:delivered_at => nil}
+  named_scope :delivered, :conditions => "delivered_at IS NOT NULL"
   default_scope :order => "id ASC"
   
   # Returns an array of all undelivered messages. If the optional id is given

@@ -40,8 +40,14 @@ class TestServer < Test::Unit::TestCase
         should("return empty json array") { assert_equal "[]", last_response.body }
       end
       
-      context "with existing OutboundMessages" do
-        setup { 5.times { Factory.create(:outbound_message) } }
+      context "with 5 existing OutboundMessages starting at ID 1" do
+        setup do 
+          (1..5).each do |id| 
+            msg = Factory.build(:outbound_message)
+            msg.id = id
+            msg.save!
+          end
+        end
         
         should "have 5 items in undelivered named_scope" do
           assert_equal 5, Communicator::OutboundMessage.undelivered.count
@@ -69,9 +75,7 @@ class TestServer < Test::Unit::TestCase
           end
 
           should "have flagged all outbound messages as delivered" do
-            Communicator::OutboundMessage.all.each do |msg|
-              assert msg.delivered_at > 5.seconds.ago
-            end
+            assert_equal 5, Communicator::OutboundMessage.delivered.count
           end
 
           should "have no outbound in undelivered named_scope" do
@@ -99,8 +103,8 @@ class TestServer < Test::Unit::TestCase
               assert_equal 200, last_response.status
             end
 
-            should "have returned 5 messages" do
-              assert_equal 5, @json.length
+            should "have returned 3 messages" do
+              assert_equal 3, @json.length
             end
 
             should "have proper representations of all messages" do
@@ -110,13 +114,11 @@ class TestServer < Test::Unit::TestCase
               end
             end
 
-            should "have flagged all outbound messages as delivered" do
-              Communicator::OutboundMessage.all.each do |msg|
-                assert msg.delivered_at > 5.seconds.ago
-              end
+            should "still have flagged all outbound messages as delivered" do
+              assert_equal 5, Communicator::OutboundMessage.delivered.count
             end
 
-            should "have no outbound in undelivered named_scope" do
+            should "still have no outbound in undelivered named_scope" do
               assert_equal 0, Communicator::OutboundMessage.undelivered.count
             end
           end
@@ -133,8 +135,8 @@ class TestServer < Test::Unit::TestCase
             assert_equal 200, last_response.status
           end
 
-          should "have returned 5 messages" do
-            assert_equal 5, @json.length
+          should "have returned 3 messages" do
+            assert_equal 3, @json.length
           end
 
           should "have proper representations of all messages" do
@@ -144,14 +146,12 @@ class TestServer < Test::Unit::TestCase
             end
           end
 
-          should "have flagged all outbound messages as delivered" do
-            Communicator::OutboundMessage.all.each do |msg|
-              assert msg.delivered_at > 5.seconds.ago
-            end
+          should "have flagged 3 outbound messages as delivered" do
+            assert_equal 3, Communicator::OutboundMessage.delivered.count
           end
 
-          should "have no outbound in undelivered named_scope" do
-            assert_equal 0, Communicator::OutboundMessage.undelivered.count
+          should "have 2 outbound in undelivered named_scope" do
+            assert_equal 2, Communicator::OutboundMessage.undelivered.count
           end
         end
       end
