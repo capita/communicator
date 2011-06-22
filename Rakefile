@@ -26,7 +26,7 @@ namespace :db do
     ActiveRecord::Migration.verbose = false
   
     # Create and migrate test databases for server and client
-    ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "db/#{db_name}.sqlite3")
+    ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "db/test_server.sqlite3")
     ActiveRecord::Migrator.migrate('db/migrate')
     ActiveRecord::Migrator.migrate('test/migrate')
   end
