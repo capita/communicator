@@ -106,7 +106,7 @@ either updating existing or creating new records.
 Use a cron job or whatever else you use for scheduling tasks in your system. There is a rake
 task that does what you usually need:
 
-rake communicator:communicate
+  rake communicator:communicate
 
 Frequency of execution depends on your application's needs, of course. For us, every other
 minute in production (and every minute in acceptance testing) works just fine.
@@ -117,13 +117,9 @@ When the structure of one of the models whose data you transfer changes or when 
 itself changes, the following steps should provide a safe path forward:
 
 1. Unschedule the rake task.
-2. Stop your applications, both the facade and the central application. This ensures that no
-new messages get added to your inbound and outbound queues.
-3. Manually execute push and pull until no further pending messages exist. Now we have reached
-a point where the system is temporarily quiescent and (message-)stable.
-4. Optionally remove all messages from the queues. You might wish not to leave any messages
-around whose format cannot be processed automatically any more. On the other hand, you might
-wish to keep them available for reference. Your call.
+2. Stop your applications, both the facade and the central application. This ensures that no new messages get added to your inbound and outbound queues.
+3. Manually execute push and pull until no further pending messages exist. Now we have reached a point where the system is temporarily quiescent and (message-)stable.
+4. Optionally remove all messages from the queues. You might wish not to leave any messages around whose format cannot be processed automatically any more. On the other hand, you might wish to keep them available for reference. Your call.
 5. Upgrade Communicator and/or your application.
 6. Reschedule the rake task.
 7. Start up your applications.
