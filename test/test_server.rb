@@ -52,40 +52,106 @@ class TestServer < Test::Unit::TestCase
             get '/messages.json', {:from_id => 1}, auth_header('someguy', 'password')
             @json = JSON.parse(last_response.body)
           end
-        
+
           should "have rendered successfully" do
             assert_equal 200, last_response.status
           end
-        
+
           should "have returned 5 messages" do
             assert_equal 5, @json.length
           end
-        
+
           should "have proper representations of all messages" do
             @json.each do |json|
               message = Communicator::OutboundMessage.find(json["id"])
               assert_equal message.body, json["body"]
             end
           end
-        
+
           should "have flagged all outbound messages as delivered" do
             Communicator::OutboundMessage.all.each do |msg|
               assert msg.delivered_at > 5.seconds.ago
             end
           end
-        
+
           should "have no outbound in undelivered named_scope" do
             assert_equal 0, Communicator::OutboundMessage.undelivered.count
           end
-        
+
           context "another GET with updated from_id" do
             setup do
               get '/messages.json', {:from_id => Communicator::OutboundMessage.first(:order => 'id DESC').id+1}, auth_header('someguy', 'password')
             end
-          
+
             should "have rendered empty json array" do
               assert_equal "[]", last_response.body
             end
+          end
+
+          context "and a from_id that is too low" do
+            setup do
+              # Here we have collected all pending messages, so we should be at id 5
+              get '/messages.json', {:from_id => 3}, auth_header('someguy', 'password')
+              @json = JSON.parse(last_response.body)
+            end
+
+            should "have rendered successfully" do
+              assert_equal 200, last_response.status
+            end
+
+            should "have returned 5 messages" do
+              assert_equal 5, @json.length
+            end
+
+            should "have proper representations of all messages" do
+              @json.each do |json|
+                message = Communicator::OutboundMessage.find(json["id"])
+                assert_equal message.body, json["body"]
+              end
+            end
+
+            should "have flagged all outbound messages as delivered" do
+              Communicator::OutboundMessage.all.each do |msg|
+                assert msg.delivered_at > 5.seconds.ago
+              end
+            end
+
+            should "have no outbound in undelivered named_scope" do
+              assert_equal 0, Communicator::OutboundMessage.undelivered.count
+            end
+          end
+        end
+
+        context "and a from_id that is too high" do
+          setup do
+            # Here we have collected no messages yet, so we should be at id 1
+            get '/messages.json', {:from_id => 3}, auth_header('someguy', 'password')
+            @json = JSON.parse(last_response.body)
+          end
+
+          should "have rendered successfully" do
+            assert_equal 200, last_response.status
+          end
+
+          should "have returned 5 messages" do
+            assert_equal 5, @json.length
+          end
+
+          should "have proper representations of all messages" do
+            @json.each do |json|
+              message = Communicator::OutboundMessage.find(json["id"])
+              assert_equal message.body, json["body"]
+            end
+          end
+
+          should "have flagged all outbound messages as delivered" do
+            Communicator::OutboundMessage.all.each do |msg|
+              assert msg.delivered_at > 5.seconds.ago
+            end
+          end
+
+          should "have no outbound in undelivered named_scope" do
+            assert_equal 0, Communicator::OutboundMessage.undelivered.count
           end
         end
       end
